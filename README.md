@@ -6,6 +6,7 @@ Uses `N=2` (hardcoded) and position + letter for the questions.
 
 ## TODO
 
+- [ ] Add a picture or something to the README
 - [ ] Clarify the state machine, I think there's a gap
 - [ ] Make N customizable in-game
 - [ ] Store scores/settings/something
