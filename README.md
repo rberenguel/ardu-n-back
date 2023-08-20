@@ -6,6 +6,8 @@ Uses `N=2` (hardcoded) and position + letter for the questions.
 
 You can try it in an online emulator [here](https://felipemanga.github.io/ProjectABE/?url=https://raw.githubusercontent.com/rberenguel/ardu-n-back/main/build/arduino.avr.leonardo/ardu-n-back.ino.hex).
 
+<img src="images/Pic.jpg" width=432/>
+
 # Screenshots
 
 ### Welcome screen. Press any button to continue
