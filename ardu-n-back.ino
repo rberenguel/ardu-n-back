@@ -240,6 +240,13 @@ void loop() {
     }
   }
 
+  if(total <= N){
+    // Otherwise it will wrongly increase when waiting
+    state = ASK;
+    answer = NOTHING;
+    return;
+  }
+
   bool sameLet = currentLet == previousLet[0];
   bool samePos = currentPos == previousPos[0];
   if (answer == BOTH_SAME) {
