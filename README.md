@@ -10,6 +10,9 @@ You can try it in an online emulator [here](https://felipemanga.github.io/Projec
 
 # Screenshots
 
+> [!NOTE]
+> I have tweaked a bit the presentation of right/wrong and stats, these screenshots are stale although they give the general idea.
+
 ### Welcome screen. Press any button to continue
 
 ![](images/Home.png)

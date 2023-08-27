@@ -19,18 +19,20 @@ int previousPos[N + 1];
 int total = 0;
 int rightPos = 0;
 int rightLet = 0;
+bool letter = false;
+bool position = false;
 
 boolean isCorrect;
 byte positions[9][2] = {
-  { GW, GH }, // TOP_LEFT
-  { 3 + GW + W, GH }, // TOP_CENTER
-  { 4 + GW + 2 * W, GH }, // TOP_RIGHT
-  { GW, GH + H }, // MID_LEFT
-  { 3 + GW + W, GH + H }, // MID_CENTER
-  { 4 + GW + 2 * W, GH + H }, // MID_RIGHT
-  { GW, GH + 2 * H }, // BOTTOM_LEFT
-  { 3 + GW + W, GH + 2 * H }, // BOTTOM_CENTER
-  { 4 + GW + 2 * W, GH + 2 * H }, // BOTTOM_RIGHT
+  { GW, GH },                      // TOP_LEFT
+  { 3 + GW + W, GH },              // TOP_CENTER
+  { 4 + GW + 2 * W, GH },          // TOP_RIGHT
+  { GW, GH + H },                  // MID_LEFT
+  { 3 + GW + W, GH + H },          // MID_CENTER
+  { 4 + GW + 2 * W, GH + H },      // MID_RIGHT
+  { GW, GH + 2 * H },              // BOTTOM_LEFT
+  { 3 + GW + W, GH + 2 * H },      // BOTTOM_CENTER
+  { 4 + GW + 2 * W, GH + 2 * H },  // BOTTOM_RIGHT
 };
 
 char letters[9] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I' };
@@ -69,7 +71,6 @@ void instructions() {
   arduboy.print("\n   DOWN:  ALL_DIFF");
   arduboy.print("\n   RIGHT: SAME_LET");
   arduboy.print("\n   LEFT:  SAME_POS");
-  arduboy.display();
   state = INSTRUCTIONS;
 }
 
@@ -82,6 +83,7 @@ void setup() {
 
   arduboy.print("Welcome to the\ndual n-back task!\n");
   instructions();
+  arduboy.display();
   for (int i = 0; i < N + 1; i++) {
     previousLet[i] = -1;
     previousPos[i] = -1;
@@ -114,21 +116,31 @@ void miniStats() {
 }
 
 void largeStats() {
-  float perPos = (rightPos * 100.0 / (total - N));
-  float perLet = (rightLet * 100.0 / (total - N));
+  int perPos = (rightPos * 100.0 / (total - N));
+  int perLet = (rightLet * 100.0 / (total - N));
   arduboy.print("\x1A ");
+  if (perPos < 10) {
+    arduboy.print(" ");
+  }
   arduboy.print(perPos);
-  arduboy.print(" A ");
+  arduboy.print("%     A ");
+  if (perLet < 10) {
+    arduboy.print(" ");
+  }
   arduboy.print(perLet);
   arduboy.print("%");
-  arduboy.print("  ");
+  arduboy.print("   \t");
+  if (total - N < 10) {
+    arduboy.print(" ");
+  }
   arduboy.print(total - N);
 }
 
 void status() {
   //debug();
   //return;
-  arduboy.setCursor(0, H * 3 + GH / 2);
+  arduboy.drawFastHLine(0, 3 * H, Arduboy2::width());
+  arduboy.setCursor(0, H * 3 + GH / 2 - 1);
   if (total <= N) {
     if (total == N) {
       arduboy.print("Now you can answer");
@@ -137,6 +149,35 @@ void status() {
     }
   } else {
     largeStats();
+  }
+}
+
+void prevResp() {
+  arduboy.setCursor(0, H * 3 + GH / 2 - 1);
+  if (total <= N) {
+    if (total == N) {
+      arduboy.print("Now you can answer");
+    } else {
+      arduboy.print("");
+    }
+  } else {
+    arduboy.print("\x1A ");
+    if (position) {
+      arduboy.print("right ");
+    } else {
+      arduboy.print("wrong ");
+    }
+    arduboy.print("  A ");
+    if (letter) {
+      arduboy.print("right ");
+    } else {
+      arduboy.print("wrong ");
+    }
+    arduboy.print("\t");
+    if (total - N < 10) {
+      arduboy.print(" ");
+    }
+    arduboy.print(total - N);
   }
 }
 
@@ -156,13 +197,13 @@ void createQuestion() {
   total++;
 }
 
-void grid(){
+void grid() {
   arduboy.drawFastHLine(0, 1, Arduboy2::width());
   arduboy.drawFastHLine(0, H, Arduboy2::width());
-  arduboy.drawFastHLine(0, 2*H, Arduboy2::width());
-  arduboy.drawFastHLine(0, 3*H, Arduboy2::width());
-  arduboy.drawFastVLine(W, 1, 3*H);
-  arduboy.drawFastVLine(2*W, 1, 3*H);
+  arduboy.drawFastHLine(0, 2 * H, Arduboy2::width());
+  arduboy.drawFastHLine(0, 3 * H, Arduboy2::width());
+  arduboy.drawFastVLine(W, 1, 3 * H);
+  arduboy.drawFastVLine(2 * W, 1, 3 * H);
 }
 
 void asking() {
@@ -174,7 +215,8 @@ void asking() {
   arduboy.setCursor(x, y);
 
   arduboy.print(letters[currentLet]);
-  status();
+  //status();
+  prevResp();
   arduboy.display();
   state = WAIT;
 }
@@ -185,7 +227,7 @@ void loop() {
   // WAIT -> ASK when answered
   // WAIT -> INSTRUCTIONS when A or B
   // INSTRUCTIONS -> WAIT when A or B
-  
+
   arduboy.pollButtons();
   if (state == ASK) {
     createQuestion();
@@ -212,23 +254,23 @@ void loop() {
     answer = SAME_POS;
   }
 
-  if(answer == NOTHING && state == INSTRUCTIONS){
+  if (answer == NOTHING && state == INSTRUCTIONS) {
     return;
   }
 
-  if(answer == NOTHING && state == WAIT){
+  if (answer == NOTHING && state == WAIT) {
     return;
   }
 
-  if(answer == OTHER){
+  if (answer == OTHER) {
     // Pressed A or B
     answer = NOTHING;
-    if(total <= N){
+    if (total <= N) {
       // Regardless, move to the next question
       state = ASK;
       return;
     }
-    if(state == INSTRUCTIONS){
+    if (state == INSTRUCTIONS) {
       // We are showing the instructions, switch to questioning
       asking();
       return;
@@ -236,11 +278,13 @@ void loop() {
       // Otherwise, show the instructions
       arduboy.clear();
       instructions();
+      status();
+      arduboy.display();
       return;
     }
   }
 
-  if(total <= N){
+  if (total <= N) {
     // Otherwise it will wrongly increase when waiting
     state = ASK;
     answer = NOTHING;
@@ -249,36 +293,46 @@ void loop() {
 
   bool sameLet = currentLet == previousLet[0];
   bool samePos = currentPos == previousPos[0];
+  position = false;
+  letter = false;
   if (answer == BOTH_SAME) {
     if (sameLet) {
       rightLet += 1;
+      letter = true;
     }
     if (samePos) {
       rightPos += 1;
+      position = true;
     }
   }
   if (answer == ALL_DIF) {
     if (!sameLet) {
       rightLet += 1;
+      letter = true;
     }
     if (!samePos) {
       rightPos += 1;
+      position = true;
     }
   }
   if (answer == SAME_POS) {
     if (!sameLet) {
       rightLet += 1;
+      letter = true;
     }
     if (samePos) {
       rightPos += 1;
+      position = true;
     }
   }
   if (answer == SAME_LET) {
     if (sameLet) {
       rightLet += 1;
+      letter = true;
     }
     if (!samePos) {
       rightPos += 1;
+      position = true;
     }
   }
   answer = NOTHING;
