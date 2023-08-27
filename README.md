@@ -10,9 +10,6 @@ You can try it in an online emulator [here](https://felipemanga.github.io/Projec
 
 # Screenshots
 
-> [!NOTE]
-> I have tweaked a bit the presentation of right/wrong and stats, these screenshots are stale although they give the general idea.
-
 ### Welcome screen. Press any button to continue
 
 ![](images/Home.png)
@@ -25,9 +22,13 @@ You can try it in an online emulator [here](https://felipemanga.github.io/Projec
 
 ![](images/Step2.png)
 
-### Once you start answering you'll get stats for position & letter
+### Once you start answering you'll get right/wrong for previous answer
 
 ![](images/Step3.png)
+
+### You can get a reminder for instructions, as well as stats by pressing `A` or `B`
+
+![](images/Step4.png)
 
 ## TODO
 
